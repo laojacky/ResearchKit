@@ -1390,6 +1390,30 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     return sanitizedText;
 }
 
+- (NSString *)scaleFormattedText:(NSString *)text decimalSeparator:(NSString *)separator {
+    NSString *formattedText = [self sanitizedTextFieldText:text decimalSeparator:separator];
+    if (_style == ORKNumericAnswerStyleDecimal) {
+        NSArray *components = [formattedText componentsSeparatedByString:separator];
+        if (separator) {
+            NSInteger scale = [self.scale integerValue];
+            NSInteger trailingZerosToAdd = 0;
+            if (components.count == 1) {
+                formattedText = [NSString stringWithFormat:@"%@%@", formattedText, separator];
+                trailingZerosToAdd = scale;
+            } else if (components.count >= 2){
+                NSString *rightOfDecimal = components[1];
+                trailingZerosToAdd = scale - rightOfDecimal.length;
+            }
+            if (trailingZerosToAdd > 0) {
+                formattedText = [formattedText stringByPaddingToLength:formattedText.length + trailingZerosToAdd withString:@"0" startingAtIndex:0];
+            }
+        }
+        
+    }
+    return formattedText;
+
+}
+
 @end
 
 

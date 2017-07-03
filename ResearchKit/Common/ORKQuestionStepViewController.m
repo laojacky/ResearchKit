@@ -432,6 +432,7 @@ typedef NS_ENUM(NSInteger, ORKQuestionSection) {
         } else if ([impliedAnswerFormat isKindOfClass:[ORKNumericAnswerFormat class]]) {
             ORKNumericQuestionResult *nqr = (ORKNumericQuestionResult *)result;
             nqr.unit = [(ORKNumericAnswerFormat *)impliedAnswerFormat unit];
+            nqr.scale = [(ORKNumericAnswerFormat *)impliedAnswerFormat scale];
         }
         
         result.startDate = parentResult.startDate;
