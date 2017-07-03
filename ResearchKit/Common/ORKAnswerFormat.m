@@ -1408,10 +1408,8 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
                 formattedText = [formattedText stringByPaddingToLength:formattedText.length + trailingZerosToAdd withString:@"0" startingAtIndex:0];
             }
         }
-        
     }
     return formattedText;
-
 }
 
 @end
