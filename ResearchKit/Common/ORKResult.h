@@ -987,11 +987,15 @@ ORK_CLASS_AVAILABLE
 /// The number collected, or `nil` if the user skipped the question.
 @property (nonatomic, copy, nullable) NSNumber *numericAnswer;
 
+/// The number scale to format the max and minimum fractional digits when obtaining the scale answer.
+@property (nonatomic, copy, nullable) NSNumber *scale;
+
 /**
  The unit string displayed to the user when the value was entered, or `nil` if no unit string was displayed.
  */
 @property (nonatomic, copy, nullable) NSString *unit;
 
+- (NSString*) scaledAnswer;
 @end
 
 

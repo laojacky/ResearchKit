@@ -98,6 +98,8 @@ ORK_DESIGNATE_CODING_AND_SERIALIZATION_INITIALIZERS(ORKHeightAnswerFormat)
 
 - (nullable NSString *)sanitizedTextFieldText:(nullable NSString *)text decimalSeparator:(nullable NSString *)separator;
 
+- (nullable NSString *)scaleFormattedText:(nullable NSString *)text decimalSeparator:(nullable NSString *)separator;
+
 @end
 
 
