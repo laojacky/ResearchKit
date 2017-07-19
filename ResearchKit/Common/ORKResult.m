@@ -1557,6 +1557,7 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
     ORKNumericQuestionResult *result = [super copyWithZone:zone];
     result->_unit = [self.unit copyWithZone:zone];
     result->_numericAnswer = [self.numericAnswer copyWithZone:zone];
+    result->_scale = [self.scale copyWithZone:zone];
     return result;
 }
 
@@ -1574,6 +1575,18 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
 
 - (id)answer {
     return self.numericAnswer;
+}
+
+- (NSString*)scaledAnswer {
+    NSInteger scale = 0;
+    if (self.scale) {
+        scale = [self.scale integerValue];
+    }
+    NSNumberFormatter* formatter = ORKDecimalNumberFormatter();
+    formatter.minimumFractionDigits = scale;
+    formatter.maximumFractionDigits = scale;
+    
+    return [formatter stringFromNumber:[self numericAnswer]];
 }
 
 - (NSString *)descriptionSuffix {

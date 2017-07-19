@@ -1297,9 +1297,9 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
         isValid = YES;
         if (isnan(number.doubleValue)) {
             isValid = NO;
-        } else if (self.minimum && (self.minimum.doubleValue > number.doubleValue)) {
+        } else if (self.minimum && ([self.minimum compare:number] == NSOrderedDescending)) {
             isValid = NO;
-        } else if (self.maximum && (self.maximum.doubleValue < number.doubleValue)) {
+        } else if (self.maximum && ([self.maximum compare:number] == NSOrderedAscending)) {
             isValid = NO;
         }
     }
@@ -1325,9 +1325,9 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     }
     NSString *string = nil;
     NSNumberFormatter *formatter = ORKDecimalNumberFormatter();
-    if (self.minimum && (self.minimum.doubleValue > num.doubleValue)) {
+    if (self.minimum && ([self.minimum compare:num] == NSOrderedDescending)) {
         string = [NSString stringWithFormat:ORKLocalizedString(@"RANGE_ALERT_MESSAGE_BELOW_MAXIMUM", nil), text, [formatter stringFromNumber:self.minimum]];
-    } else if (self.maximum && (self.maximum.doubleValue < num.doubleValue)) {
+    } else if (self.maximum && ([self.maximum compare:num] == NSOrderedAscending)) {
         string = [NSString stringWithFormat:ORKLocalizedString(@"RANGE_ALERT_MESSAGE_ABOVE_MAXIMUM", nil), text, [formatter stringFromNumber:self.maximum]];
     } else {
         string = [NSString stringWithFormat:ORKLocalizedString(@"RANGE_ALERT_MESSAGE_OTHER", nil), text];
@@ -1388,6 +1388,28 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
         sanitizedText = [self removeDecimalSeparatorsFromText:text numAllowed:0 separator:(NSString *)separator];
     }
     return sanitizedText;
+}
+
+- (NSString *)scaleFormattedText:(NSString *)text decimalSeparator:(NSString *)separator {
+    NSString *formattedText = [self sanitizedTextFieldText:text decimalSeparator:separator];
+    if (_style == ORKNumericAnswerStyleDecimal) {
+        NSArray *components = [formattedText componentsSeparatedByString:separator];
+        if (separator) {
+            NSInteger scale = [self.scale integerValue];
+            NSInteger trailingZerosToAdd = 0;
+            if (components.count == 1) {
+                formattedText = [NSString stringWithFormat:@"%@%@", formattedText, separator];
+                trailingZerosToAdd = scale;
+            } else if (components.count >= 2){
+                NSString *rightOfDecimal = components[1];
+                trailingZerosToAdd = scale - rightOfDecimal.length;
+            }
+            if (trailingZerosToAdd > 0) {
+                formattedText = [formattedText stringByPaddingToLength:formattedText.length + trailingZerosToAdd withString:@"0" startingAtIndex:0];
+            }
+        }
+    }
+    return formattedText;
 }
 
 @end

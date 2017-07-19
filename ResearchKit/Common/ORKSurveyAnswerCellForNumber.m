@@ -86,6 +86,16 @@
     [self setUpConstraints];
 }
 
+- (instancetype)initWithStyle:(UITableViewCellStyle)style
+              reuseIdentifier:(NSString *)reuseIdentifier
+                         step:(ORKQuestionStep *)step
+                       answer:(id)answer
+                     delegate:(id<ORKSurveyAnswerCellDelegate>)delegate {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier step:step answer:answer delegate:delegate];
+    [self displayFormattedNumber];
+    return self;
+}
+
 - (void)addPlusMinusAccessoryToField:(UITextField*) field {
     UIView *inputAccesoryView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 42)];
     // It´s good idea a view under the button in order to change the color...more custom option
@@ -113,7 +123,7 @@
     
     if (![textField.text hasPrefix:@"-"])
     {
-        textField.text = [NSString stringWithFormat:@"-%@",textField.text];
+        [textField setText: [NSString stringWithFormat:@"-%@",textField.text]];
         if (textField.text.length > 1) {
             [self valueFieldDidChange:textField];
         }
@@ -125,11 +135,11 @@
     
     if ([textField.text hasPrefix:@"-"])
     {
-        textField.text = [textField.text substringFromIndex:1];
-        textField.text = [NSString stringWithFormat:@" %@",textField.text];
-        if (textField.text.length > 1) {
-            [self valueFieldDidChange:textField];
-        }
+        NSString * unsignedString = [textField.text substringFromIndex:1];
+        [textField setText:@""]; // set to empty to force answer to change
+        [self valueFieldDidChange:textField];
+        [textField setText:unsignedString]; // answer will now be changed to unsigned value
+        [self valueFieldDidChange:textField];
     }
 }
     
@@ -184,7 +194,6 @@
     }
     
     [self answerDidChange];
-    
     [super prepareView];
 }
 
@@ -208,6 +217,13 @@
     }
     
     return isValid;
+}
+
+-(void)displayFormattedNumber {
+    [self answerDidChange];
+    ORKNumericAnswerFormat *answerFormat = (ORKNumericAnswerFormat *)[self.step impliedAnswerFormat];
+    NSString *formattedText = [answerFormat scaleFormattedText:[self.textField text] decimalSeparator:[_numberFormatter decimalSeparator]];
+    self.textField.text = formattedText;
 }
 
 - (void)answerDidChange {
@@ -259,6 +275,10 @@
 }
 
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
+    ORKNumericAnswerFormat *answerFormat = (ORKNumericAnswerFormat *)[self.step impliedAnswerFormat];
+    NSString *formattedText = [answerFormat scaleFormattedText:[textField text] decimalSeparator:[_numberFormatter decimalSeparator]];
+    textField.text = formattedText;
+    
     BOOL isValid = [self isAnswerValid];
     if (!isValid) {
         [self showValidityAlertWithMessage:[[self.step impliedAnswerFormat] localizedInvalidValueStringWithAnswerString:textField.text]];
