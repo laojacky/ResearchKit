@@ -1740,30 +1740,28 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
 - (void)validateParameters {
     [super validateParameters];
     
-    const double ORKScaleAnswerFormatValueLowerbound = -10000;
-    const double ORKScaleAnswerFormatValueUpperbound = 10000;
+    const double ORKScaleAnswerFormatValueLowerbound = 0;
+    const double ORKScaleAnswerFormatValueUpperbound = 1000;
     
     // Just clamp maximumFractionDigits to be 0-4. This is all aimed at keeping the maximum
-    // number of digits down to 6 or less.
+    // number of digits down to 7 or less.
     _maximumFractionDigits = MAX(_maximumFractionDigits, 0);
     _maximumFractionDigits = MIN(_maximumFractionDigits, 4);
     
-    double effectiveUpperbound = ORKScaleAnswerFormatValueUpperbound * pow(0.1, _maximumFractionDigits);
-    double effectiveLowerbound = ORKScaleAnswerFormatValueLowerbound * pow(0.1, _maximumFractionDigits);
     
     if (_maximum <= _minimum) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:@"Expect maximumValue larger than minimumValue"] userInfo:nil];
     }
     
-    if (_minimum < effectiveLowerbound) {
+    if (_minimum < ORKScaleAnswerFormatValueLowerbound) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException
-                                       reason:[NSString stringWithFormat:@"minimumValue should not less than %@ with %@ fractional digits", @(effectiveLowerbound), @(_maximumFractionDigits)]
+                                       reason:[NSString stringWithFormat:@"minimumValue should not less than %@ with %@ fractional digits", @(ORKScaleAnswerFormatValueLowerbound), @(_maximumFractionDigits)]
                                      userInfo:nil];
     }
     
-    if (_maximum > effectiveUpperbound) {
+    if (_maximum > ORKScaleAnswerFormatValueUpperbound) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException
-                                       reason:[NSString stringWithFormat:@"maximumValue should not more than %@ with %@ fractional digits", @(effectiveUpperbound), @(_maximumFractionDigits)]
+                                       reason:[NSString stringWithFormat:@"maximumValue should not more than %@ with %@ fractional digits", @(ORKScaleAnswerFormatValueUpperbound), @(_maximumFractionDigits)]
                                      userInfo:nil];
     }
 }
